@@ -1,0 +1,14 @@
+.DS_Store
+
+.idea/
+*.iml
+
+node_modules
+npm-debug.log
+
+build
+dist
+.cache
+.parcel-cache
+
+secrets

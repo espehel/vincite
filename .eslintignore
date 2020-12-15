@@ -1,0 +1,8 @@
+node_modules
+build
+package.json
+assets
+.idea
+.expo-shared
+babel.config.js
+prettier.config.js
