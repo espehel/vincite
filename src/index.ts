@@ -1,44 +1,8 @@
-import { Application, Sprite, Loader } from 'pixi.js';
+import { Application, Sprite } from 'pixi.js';
 import { scaleToWindow } from './utils/scaleToWindow/scaleToWindow';
 import { listenKeyDown } from './utils/key-events';
 import { Viewport } from 'pixi-viewport';
-
-const loader = Loader.shared;
-
-const map = [
-  [
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-  ],
-  [
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-  ],
-  [
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-  ],
-  [
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-    'dirt_02.png',
-  ],
-];
+import AssetsLoader, { TerrainTextures, TerrainType } from './AssetsLoader';
 
 let app = new Application({ antialias: true });
 document.body.appendChild(app.view);
@@ -73,24 +37,64 @@ window.addEventListener('resize', () => {
   scaleToWindow(app.renderer.view);
 });
 
-const sprites = new Map<String, Sprite>();
+interface MapTile {
+  x: number;
+  y: number;
+  terrain: TerrainType;
+}
 
-loader.onProgress.add((loader) => {
-  console.log(`progress: ${loader.progress}%`);
-});
+const getTerrain = (): TerrainType => {
+  const randomNumber = Math.random();
 
-loader.add('terrain', './terrain.json').load(() => {
-  let terrain = loader.resources.terrain.textures;
-  if (terrain) {
-    for (let i = 0; i < map.length; i++) {
-      for (let j = 0; j < map[i].length; j++) {
-        const tile = new Sprite(terrain[map[i][j]]);
-        const offset = (i % 2) * 60;
-        tile.x = j * 120 + offset;
-        tile.y = i * 100;
-        tile.anchor.set(0.5);
-        viewport.addChild(tile);
-      }
+  const tileFitness: Array<[TerrainType, number]> = [
+    ['desert', 1],
+    ['forest', 1],
+    ['grass', 1],
+    ['mountain', 1],
+    ['plain', 1],
+  ];
+
+  const fitnessSum = tileFitness.reduce((acc, [, cur]) => acc + cur, 0);
+  const selection = randomNumber * fitnessSum;
+
+  let accFitness = 0;
+  for (let i = 0; i < tileFitness.length; i++) {
+    const [terrain, fitness] = tileFitness[i];
+    if (selection < fitness + accFitness) {
+      return terrain;
+    } else {
+      accFitness += fitness;
     }
   }
+  return tileFitness[tileFitness.length - 1][0];
+};
+
+const generateMap = (width: number, height: number) => {
+  const map: Array<MapTile> = [];
+  for (let i = 0; i < width; i++) {
+    for (let j = 0; j < height; j++) {
+      map.push({
+        x: j,
+        y: i,
+        terrain: getTerrain(),
+      });
+    }
+  }
+  return map;
+};
+
+const renderMap = (map: Array<MapTile>, textures: TerrainTextures) => {
+  map.forEach((mapTile) => {
+    const tile = new Sprite(textures[mapTile.terrain]);
+    const offset = (mapTile.y % 2) * 60;
+    tile.x = mapTile.x * 120 + offset;
+    tile.y = mapTile.y * 100;
+    tile.anchor.set(0.5);
+    viewport.addChild(tile);
+  });
+};
+
+AssetsLoader().then((terrainTextures) => {
+  const map = generateMap(15, 15);
+  renderMap(map, terrainTextures);
 });
