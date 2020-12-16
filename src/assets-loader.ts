@@ -6,7 +6,7 @@ export type TerrainTextures = Required<Record<TerrainType, Texture>>;
 export type ResourceType = 'terrain';
 export type TerrainType = 'grass' | 'desert' | 'mountain' | 'forest' | 'plain';
 
-const AssetsLoader = (): Promise<TerrainTextures> =>
+export const loadAssets = (): Promise<TerrainTextures> =>
   new Promise<TerrainTextures>((resolve, reject) => {
     try {
       loader.onProgress.add((loader) => {
@@ -34,5 +34,3 @@ const AssetsLoader = (): Promise<TerrainTextures> =>
       reject(e);
     }
   });
-
-export default AssetsLoader;
