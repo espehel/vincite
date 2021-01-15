@@ -45,3 +45,5 @@ export const generateMap = (width: number, height: number) => {
   }
   return map;
 };
+
+export const getPlayerStart = (map: Array<MapTile>): MapTile => {};
