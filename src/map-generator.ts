@@ -1,9 +1,9 @@
-import { TerrainType } from './assets-loader';
+import { SettlementType, TerrainType } from './assets-loader';
 
 export interface MapTile {
   x: number;
   y: number;
-  terrain: TerrainType;
+  terrain: TerrainType | SettlementType;
 }
 
 const getTerrain = (): TerrainType => {
@@ -46,4 +46,6 @@ export const generateMap = (width: number, height: number) => {
   return map;
 };
 
-export const getPlayerStart = (map: Array<MapTile>): MapTile => {};
+export const getPlayerStart = (): MapTile => {
+  return { x: 2, y: 2, terrain: 'village' };
+};

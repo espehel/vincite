@@ -1,4 +1,4 @@
-import { TerrainTextures } from './assets-loader';
+import { Textures } from './assets-loader';
 import { Application, Sprite } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
 import { listenKeyDown } from './utils/key-events';
@@ -6,8 +6,10 @@ import { MapTile } from './map-generator';
 
 export default class GameRenderer {
   viewport: Viewport;
+  textures: Textures;
 
-  constructor(app: Application) {
+  constructor(app: PIXI.Application, textures: Textures) {
+    this.textures = textures;
     this.viewport = new Viewport({
       screenWidth: window.innerWidth,
       screenHeight: window.innerHeight,
@@ -47,14 +49,16 @@ export default class GameRenderer {
     });
   };
 
-  renderMap = (map: Array<MapTile>, textures: TerrainTextures) => {
-    map.forEach((mapTile) => {
-      const tile = new Sprite(textures[mapTile.terrain]);
-      const offset = (mapTile.y % 2) * 60;
-      tile.x = mapTile.x * 120 + offset;
-      tile.y = mapTile.y * 100;
-      tile.anchor.set(0.5);
-      this.viewport.addChild(tile);
-    });
+  renderMap = (map: Array<MapTile>) => {
+    map.forEach(this.renderTile);
+  };
+
+  renderTile = (tile: MapTile) => {
+    const sprite = new Sprite(this.textures[tile.terrain]);
+    const offset = (tile.y % 2) * 60;
+    sprite.x = tile.x * 120 + offset;
+    sprite.y = tile.y * 100;
+    sprite.anchor.set(0.5);
+    this.viewport.addChild(sprite);
   };
 }

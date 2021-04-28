@@ -8,8 +8,6 @@ let app = new Application({ antialias: true });
 document.body.appendChild(app.view);
 app.renderer.backgroundColor = 0x008dc7;
 
-const gameRenderer = new GameRenderer(app);
-
 scaleToWindow(app.renderer.view);
 window.addEventListener('resize', () => {
   scaleToWindow(app.renderer.view);
@@ -30,8 +28,9 @@ const player: Player = {
 };
 
 loadAssets().then((terrainTextures) => {
+  const gameRenderer = new GameRenderer(app, terrainTextures);
   const map = generateMap(15, 15);
-  const playerStart = getPlayerStart(map);
-  gameRenderer.renderMap(map, terrainTextures);
-  gameRenderer.renderSettlement();
+  const playerStart = getPlayerStart();
+  gameRenderer.renderMap(map);
+  gameRenderer.renderTile(playerStart);
 });
